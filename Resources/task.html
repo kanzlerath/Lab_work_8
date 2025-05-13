@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Постановка задачи — Комплексные числа</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            margin: 30px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        code {
+            background-color: #f2f2f2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 10px 15px;
+            border-left: 3px solid #ccc;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        ul {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Постановка задачи</h1>
+
+    <p>
+        Комплексным числом называется выражение вида <code>a + bi</code>, где <code>a</code> и <code>b</code> – действительные числа.
+        Для описания констант в языке Python используется служебное слово <code>complex</code>.
+    </p>
+
+    <p>Формат записи и инициализации комплексного числа представлен ниже:</p>
+
+    <pre>имя_переменной = complex(действительное_число, действительное_число);</pre>
+
+    <p><strong>Примеры:</strong></p>
+    <ul>
+        <li>Комплексное число с целой действительной и мнимой частями: <code>z1 = complex(2, 3);</code></li>
+        <li>Комплексное число с действительной целой и дробной мнимой частями: <code>z2 = complex(2, 3.7);</code></li>
+        <li>Комплексное число с действительной дробной и целой мнимой частями: <code>z3 = complex(4.9, 82);</code></li>
+    </ul>
+
+    <p>
+        В связи с разработанной автоматной грамматикой <code>G[&lt;C&gt;]</code>,
+        синтаксический анализатор комплексных чисел будет считать верными следующие записи:
+    </p>
+
+    <ul>
+        <li><code>z1 = complex(-3, +2);</code></li>
+        <li><code>z2 = complex(8.91, -3);</code></li>
+        <li><code>z3 = complex(-7.98, 2.71);</code></li>
+        <li><code>z4 = complex(21, 3.92);</code></li>
+    </ul>
+
+</body>
+</html>

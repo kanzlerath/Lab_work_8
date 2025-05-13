@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Исходный код программы</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            margin: 30px;
+            line-height: 1.7;
+        }
+
+        h1, h2 {
+            margin-top: 25px;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            line-height: 1.4;
+        }
+
+        code {
+            font-family: Consolas, monospace;
+        }
+
+        .code-block {
+            margin: 20px 0;
+        }
+
+        .filename {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Исходный код программы</h1>
+
+
+    <div class="code-block">
+        <div class="filename">Lexer.cs - Лексер</div>
+        <pre><code>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Lab1_compile
+{
+    internal class Lexer
+    {
+        private int complexFlag = 0;
+        private int idFlag = 0;
+        private string _input;
+        private int _position;
+        private List<ParseError> _errors;
+
+        public Lexer(string input)
+        {
+            _input = input;
+            _position = 0;
+            _errors = new List<ParseError>();
+        }
+
+        public List<Token> Tokenize()
+        {
+            List<Token> tokens = new List<Token>();
+
+            while (_position < _input.Length)
+            {
+                char currentChar = _input[_position];
+
+                if (char.IsWhiteSpace(currentChar))
+                {
+                    _position++;
+                    continue;
+                }
+
+                if (char.IsLetter(currentChar) || currentChar == '_')
+                {
+                    tokens.Add(ExtractIdentifier());
+                    continue;
+                }
+
+                if (char.IsDigit(currentChar) || currentChar == '-')
+                {
+                    Token numToken = ExtractNumber();
+                    if (numToken != null)
+                    {
+                        tokens.Add(numToken);
+                    }
+                    continue;
+                }
+
+                if (currentChar == '=')
+                {
+                    if (_position + 1 < _input.Length && _input[_position + 1] == '=')
+                    {
+                        tokens.Add(new Token(12, "Оператор сравнения", "==", _position, _position + 1));
+                        _position += 2;
+                    }
+                    else
+                    {
+                        tokens.Add(new Token(4, "Оператор", "=", _position, _position));
+                        _position++;
+                    }
+                    continue;
+                }
+
+                if (currentChar == ',')
+                {
+                    tokens.Add(new Token(10, "Разделитель", ",", _position, _position));
+                    _position++;
+                    continue;
+                }
+
+                if (currentChar == '(')
+                {
+                    tokens.Add(new Token(5, "Скобка", "(", _position, _position));
+                    _position++;
+                    continue;
+                }
+
+                if (currentChar == ')')
+                {
+                    tokens.Add(new Token(6, "Скобка", ")", _position, _position));
+                    _position++;
+                    continue;
+                }
+
+                if (currentChar == ';')
+                {
+                    tokens.Add(new Token(11, "Конец оператора", ";", _position, _position));
+                    _position++;
+                    continue;
+                }
+
+                _errors.Add(new ParseError($"Ошибка: недопустимый символ '{currentChar}' в позиции {_position}",
+                    new Token(-1, "Ошибка", currentChar.ToString(), _position, _position)));
+
+                _position++;
+            }
+
+            return tokens;
+        }
+
+        private Token ExtractIdentifier()
+        {
+            if (complexFlag == 1)
+            {
+                _position++;
+                return null;
+            }
+            int start = _position;
+            while (_position < _input.Length && (char.IsLetterOrDigit(_input[_position]) || _input[_position] == '_'))
+            {
+                _position++;
+            }
+
+            string value = _input.Substring(start, _position - start);
+
+            if (value == "complex")
+            {
+                return new Token(2, "Ключевое слово", value, start, _position - 1);
+            }
+            else if (_position < 5)
+            {
+                if (idFlag == 1)
+                {
+                    while (_input[_position + 1] != '=')
+                    {
+                        _position++;
+                    }
+                    return null;
+                }
+                    idFlag = 1;
+                return new Token(1, "Идентификатор", value, start, _position - 1);
+            }
+            else
+            {
+                if (complexFlag == 0)
+                {
+                    _errors.Add(new ParseError($"Неверное написание ключевого слова complex",
+                        new Token(-1, "Ошибка", value, start, _position - 1)));
+                    while (_input[_position + 1] != '(')
+                    {
+                        _position++;
+                    };
+                    complexFlag = 1;
+                }
+                //
+                return new Token(1, "Идентификатор", value, start, _position - 1);
+            }
+
+            //return new Token(1, "Идентификатор", value, start, _position - 1);
+        }
+
+        private Token ExtractNumber()
+        {
+            int start = _position;
+            bool hasDecimal = false;
+
+            if (_input[_position] == '-')
+            {
+                _position++;
+            }
+
+            while (_position < _input.Length && char.IsDigit(_input[_position]))
+            {
+                _position++;
+            }
+
+            if (_position < _input.Length && _input[_position] == '.')
+            {
+                hasDecimal = true;
+                int dotPosition = _position;
+                _position++;
+
+                if (_position >= _input.Length || !char.IsDigit(_input[_position]))
+                {
+                    _errors.Add(new ParseError($"Ошибка: ожидалось число после точки, найдено '{_input.Substring(start, _position - start)}'",
+                        new Token(-1, "Ошибка", _input.Substring(start, _position - start), start, _position - 1)));
+
+                    _position++;
+                    return null;
+                }
+
+                while (_position < _input.Length && char.IsDigit(_input[_position]))
+                {
+                    _position++;
+                }
+            }
+
+            string value = _input.Substring(start, _position - start);
+            return new Token(hasDecimal ? 9 : 8, hasDecimal ? "Число (вещественное)" : "Число (целое)", value, start, _position - 1);
+        }
+
+        public List<ParseError> GetErrors()
+        {
+            return _errors;
+        }
+    }
+}
+</code></pre>
+    </div>
+
+
+
+    <div class="code-block">
+        <div class="filename">ParseError.cs - Класс ошибок</div>
+        <pre><code>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Lab1_compile
+{
+    internal class ParseError
+    {
+        public string Message { get; }
+        public string TokenValue { get; }
+        public int Position { get; }
+
+        public ParseError(string message, Token token)
+        {
+            Message = message;
+            TokenValue = token?.Value ?? "EOF";
+            Position = token?.Start ?? -1;
+        }
+    }
+}
+</code></pre>
+    </div>
+
+    <div class="code-block">
+        <div class="filename">Token.cs - Токен</div>
+        <pre><code>
+            using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Lab1_compile
+{
+    internal class Token
+    {
+        public int Code { get; }
+        public string Type { get; }
+        public string Value { get; }
+        public int Start { get; }
+        public int End { get; }
+
+        public Token(int code, string type, string value, int start, int end)
+        {
+            Code = code;
+            Type = type;
+            Value = value;
+            Start = start;
+            End = end;
+        }
+
+        public override string ToString()
+        {
+            return $"{Code} - {Type} - {Value} ({Start}-{End})";
+        }
+    }
+}
+</code></pre>
+    </div>
+
+    <div class="code-block">
+        <div class="filename">Form1.cs </div>
+        <pre><code>
+private void button9_Click(object sender, EventArgs e)
+{
+    if (tabControl1.SelectedTab is EditorTab tab)
+    {
+        
+        Lexer lexer = new Lexer(editor.Text);
+        List<Token> tokens = lexer.Tokenize();
+        List<ParseError> errors = lexer.GetErrors();
+        
+        
+        foreach (Token token in tokens)
+        {
+            if (token == null) continue;
+            else
+            {
+                outputGrid.Rows.Add(
+                    token.Type,
+                    token.Value,
+                    $"{token.Start}-{token.End}",
+                    $"Код: {token.Code}"
+                );
+            }
+        }
+        
+        foreach (ParseError error in errors)
+        {
+            outputGrid.Rows.Add(
+                "Ошибка",
+                error.TokenValue,
+                error.Position.ToString(),
+                error.Message
+            );
+        }
+        
+        if (outputGrid.Rows.Count == 0)
+        {
+            outputGrid.Rows.Add("Информация", "Нет данных", "", "Ошибок нет");
+        }
+    }
+}
+        </code></pre>
+    </div>
+</body>
+</html>

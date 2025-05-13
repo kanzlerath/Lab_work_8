@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Метод анализа</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            margin: 30px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        img {
+            width: 30%;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        figcaption {
+            text-align: center;
+            font-style: italic;
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Метод анализа</h1>
+
+    <p>
+        Так как грамматика <code>G[&lt;C&gt;]</code> является автоматной, реализуем её правила (1) – (28)
+        на графе (см. рисунок ниже).
+    </p>
+
+    <figure>
+        <img src="image.png" alt="Граф автоматной грамматики G[C]">
+        <figcaption>Рисунок 1 – Граф G[&lt;C&gt;]</figcaption>
+    </figure>
+
+    <p>
+        Сплошными стрелками обозначен синтаксически верный процесс разбора, а пунктирными — переход в состояние ошибки,
+        то есть наличие синтаксических ошибок. Состояние <strong>16</strong> обозначает успешное завершение разбора.
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Грамматика комплексных чисел</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            margin: 30px;
+            line-height: 1.7;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-left: 4px solid #aaa;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            white-space: pre-wrap;
+        }
+
+        code {
+            font-family: Consolas, monospace;
+            background-color: #f2f2f2;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Грамматика</h1>
+
+    <p>
+        Определим грамматику комплексных чисел языка Python <code>G[&lt;C&gt;]</code> в нотации Хомского с продукциями <code>P</code>:
+    </p>
+
+    <pre>
+&lt;C&gt; → &lt;Letter&gt;&lt;A&gt;
+&lt;A&gt; → &lt;Letter&gt;&lt;B&gt;
+&lt;B&gt; → &lt;Letter&gt;&lt;B&gt;
+&lt;B&gt; → &lt;Digit&gt;&lt;D&gt;
+&lt;D&gt; → &lt;Digit&gt;&lt;D&gt;
+&lt;B&gt; → '='&lt;E&gt;
+&lt;D&gt; → '='&lt;E&gt;
+&lt;E&gt; → 'complex'&lt;F&gt;
+&lt;F&gt; → '('&lt;G&gt;
+&lt;G&gt; → '+'&lt;H&gt;
+&lt;G&gt; → '-'&lt;H&gt;
+&lt;G&gt; → &lt;Digit&gt;&lt;J&gt;
+&lt;H&gt; → &lt;Digit&gt;&lt;J&gt;
+&lt;J&gt; → &lt;Digit&gt;&lt;J&gt;
+&lt;J&gt; → '.'&lt;K&gt;
+&lt;K&gt; → &lt;Digit&gt;&lt;K&gt;
+&lt;J&gt; → ','&lt;L&gt;
+&lt;K&gt; → ','&lt;L&gt;
+&lt;L&gt; → '+' &lt;M&gt;
+&lt;L&gt; → '-' &lt;M&gt;
+&lt;L&gt; → &lt;Digit&gt;&lt;N&gt;
+&lt;M&gt; → &lt;Digit&gt;&lt;N&gt;
+&lt;N&gt; → &lt;Digit&gt;&lt;N&gt;
+&lt;N&gt; → '.'&lt;P&gt;
+&lt;P&gt; → &lt;Digit&gt;&lt;P&gt;
+&lt;P&gt; → ')'&lt;End&gt;
+&lt;N&gt; → ')'&lt;End&gt;
+&lt;End&gt; → ';'
+&lt;Digit&gt;</> → "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+&lt;Letter&gt; → "a" | "b" | "c" | … | "y" | "z" | "A" | "B" | "C" | … | "Y" | "Z"
+    </pre>
+
+    <p>Следуя введённому формальному определению грамматики, представим <code>G[&lt;C&gt;]</code> её составляющими:</p>
+
+    <ul>
+        <li><strong>Z</strong> = &lt;C&gt;</li>
+        <li><strong>V<sub>T</sub></strong> = {a, b, c, …, y, z, A, B, C, …, Y, Z, =, +, -, (, ), ., ,, ;, 0, 1, …, 8, 9}</li>
+        <li><strong>V<sub>N</sub></strong> = {&lt;C&gt;, &lt;A&gt;, &lt;B&gt;, &lt;D&gt;, &lt;E&gt;, &lt;F&gt;, &lt;G&gt;, &lt;H&gt;, &lt;J&gt;, &lt;K&gt;, &lt;L&gt;, &lt;M&gt;, &lt;N&gt;, &lt;P&gt;, &lt;End&gt;}</li>
+    </ul>
+
+</body>
+</html>
