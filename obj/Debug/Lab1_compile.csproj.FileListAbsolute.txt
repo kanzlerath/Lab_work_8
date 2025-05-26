@@ -37,3 +37,16 @@ C:\Mac\Home\Desktop\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.pdb
 C:\Mac\Home\Desktop\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.exe.config
 C:\Mac\Home\Desktop\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.exe
 C:\Mac\Home\Desktop\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.pdb
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.csproj.AssemblyReference.cache
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.g.resources
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.Form1.resources
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.Properties.Resources.resources
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.Resources.Strings.resources
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.Resources.StringsEN.resources
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.csproj.GenerateResource.cache
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.csproj.CoreCompileInputs.cache
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.exe
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\obj\Debug\Lab1_compile.pdb
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.exe.config
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.exe
+C:\Mac\Home\Desktop\Компиляторы\Lab1_compile\Lab1_compile\bin\Debug\Lab1_compile.pdb

@@ -70,6 +70,7 @@
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="PolishNotation.cs" />
     <Compile Include="RecursiveDescentParser.cs" />
+    <Compile Include="RegexPatterns.cs" />
     <Compile Include="Resources\StringsEN.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

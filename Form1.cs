@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using Lab1_compile;
 
 namespace Lab1_compile
 {
@@ -765,72 +767,56 @@ namespace Lab1_compile
                 outputGrid.Columns.Add("Value", "Значение");
                 outputGrid.Columns.Add("Position", "Позиция");
                 outputGrid.Columns.Add("Description", "Описание");
-                
-                // Лексический анализ
-                Lexer lexer = new Lexer(editor.Text);
-                List<Token> tokens = lexer.Tokenize();
-                List<ParseError> errors = lexer.GetErrors();
-                
-                // Если есть лексические ошибки — выводим только ошибки
-                if (errors.Count > 0)
-                {
-                    foreach (var error in errors)
-                    {
-                        outputGrid.Rows.Add(
-                            "Ошибка",
-                            error.Token.Value,
-                            $"{error.Token.StartPosition}-{error.Token.EndPosition}",
-                            error.Message
-                        );
-                        HighlightError(editor, error.Token.StartPosition, error.Token.EndPosition);
-                    }
-                    return;
-                }
-                
-                // Синтаксический анализ
-                RecursiveDescentParser parser = new RecursiveDescentParser(tokens);
-                if (!parser.Parse())
-                {
-                    foreach (var error in parser.GetErrors())
-                    {
-                        outputGrid.Rows.Add(
-                            "Ошибка",
-                            error.Token.Value,
-                            $"{error.Token.StartPosition}-{error.Token.EndPosition}",
-                            error.Message
-                        );
-                        HighlightError(editor, error.Token.StartPosition, error.Token.EndPosition);
-                    }
-                    return;
-                }
-                
-                // Если ошибок нет — выводим токены и ПОЛИЗ
-                foreach (var token in tokens)
+
+                string text = editor.Text;
+
+                // Поиск файлов
+                var fileMatches = RegexPatterns.FindMatches(text, RegexPatterns.FilePattern);
+                foreach (Match match in fileMatches)
                 {
                     outputGrid.Rows.Add(
-                        token.Type,
-                        token.Value,
-                        $"{token.StartPosition}-{token.EndPosition}",
-                        token.Description
+                        "Файл",
+                        match.Value,
+                        $"{match.Index}-{match.Index + match.Length}",
+                        "Соответствует формату .doc, .docx, .pdf"
                     );
+                    HighlightWord(editor, match.Value, Color.Blue);
                 }
-                PolishNotation polish = new PolishNotation();
-                List<string> polishNotation = polish.ConvertToPolishNotation(tokens);
-                outputGrid.Rows.Add(-2, "---", "---", "Польская инверсная запись (ПОЛИЗ)");
-                string polizString = string.Join(" ", polishNotation);
-                outputGrid.Rows.Add(-2, polizString, "---", "Результат преобразования");
-                try
+
+                // Поиск номеров карт Maestro
+                var cardMatches = RegexPatterns.FindMatches(text, RegexPatterns.MaestroCardPattern);
+                foreach (Match match in cardMatches)
                 {
-                    double result = polish.EvaluatePolishNotation(polishNotation);
-                    outputGrid.Rows.Add(-2, result.ToString(), "---", "Результат вычисления");
-                    // Визуализация шагов
-                    var steps = polish.EvaluatePolishNotationWithSteps(polishNotation);
-                    var stepsForm = new FormPolishSteps(steps);
-                    stepsForm.Show();
+                    outputGrid.Rows.Add(
+                        "Карта Maestro",
+                        match.Value,
+                        $"{match.Index}-{match.Index + match.Length}",
+                        "Номер карты Maestro"
+                    );
+                    HighlightWord(editor, match.Value, Color.Green);
                 }
-                catch (Exception ex)
+
+                // Поиск IPv6 адресов
+                var ipv6Matches = RegexPatterns.FindMatches(text, RegexPatterns.IPv6Pattern);
+                foreach (Match match in ipv6Matches)
                 {
-                    outputGrid.Rows.Add("Ошибка", "-", "-", $"Ошибка вычисления: {ex.Message}");
+                    outputGrid.Rows.Add(
+                        "IPv6",
+                        match.Value,
+                        $"{match.Index}-{match.Index + match.Length}",
+                        "IPv6 адрес"
+                    );
+                    HighlightWord(editor, match.Value, Color.Purple);
+                }
+
+                if (outputGrid.Rows.Count == 0)
+                {
+                    outputGrid.Rows.Add(
+                        "Информация",
+                        "-",
+                        "-",
+                        "Совпадений не найдено"
+                    );
                 }
             }
         }
