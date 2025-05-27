@@ -765,59 +765,155 @@ namespace Lab1_compile
                 outputGrid.Columns.Clear();
                 outputGrid.Columns.Add("Type", "Тип");
                 outputGrid.Columns.Add("Value", "Значение");
-                outputGrid.Columns.Add("Position", "Позиция");
-                outputGrid.Columns.Add("Description", "Описание");
+                outputGrid.Columns.Add("Position", "Позиция"); // Позиция начала для токенов или шагов разбора
+                outputGrid.Columns.Add("Description", "Описание"); // Описание для токенов или сообщения об ошибке
 
-                string text = editor.Text;
+                string inputText = editor.Text;
 
-                // Поиск файлов
-                var fileMatches = RegexPatterns.FindMatches(text, RegexPatterns.FilePattern);
-                foreach (Match match in fileMatches)
+                // --- SQL Парсер --- //
+
+                // Лексический анализ с новым SQL лексером
+                SqlLexer sqlLexer = new SqlLexer(inputText);
+                List<SqlToken> sqlTokens = sqlLexer.Tokenize();
+                List<SqlParseError> lexicalErrors = sqlLexer.GetErrors();
+
+                // Выводим лексические ошибки, если есть
+                if (lexicalErrors.Any())
                 {
-                    outputGrid.Rows.Add(
-                        "Файл",
-                        match.Value,
-                        $"{match.Index}-{match.Index + match.Length}",
-                        "Соответствует формату .doc, .docx, .pdf"
-                    );
-                    HighlightWord(editor, match.Value, Color.Blue);
+                    outputGrid.Rows.Add("Информация", "---", "---", "Лексические ошибки:");
+                    foreach (var error in lexicalErrors)
+                    {
+                        outputGrid.Rows.Add(
+                            "Лекс. Ошибка",
+                            error.Token.Value,
+                            error.Token.Position,
+                            error.Message
+                        );
+                    }
                 }
 
-                // Поиск номеров карт Maestro
-                var cardMatches = RegexPatterns.FindMatches(text, RegexPatterns.MaestroCardPattern);
-                foreach (Match match in cardMatches)
+                // Выводим лексемы
+                outputGrid.Rows.Add("Информация", "---", "---", "Лексемы:");
+                foreach (var token in sqlTokens)
                 {
                     outputGrid.Rows.Add(
-                        "Карта Maestro",
-                        match.Value,
-                        $"{match.Index}-{match.Index + match.Length}",
-                        "Номер карты Maestro"
+                        "Лексема",
+                        token.Value,
+                        token.Position,
+                        token.Type.ToString()
                     );
-                    HighlightWord(editor, match.Value, Color.Green);
                 }
 
-                // Поиск IPv6 адресов
-                var ipv6Matches = RegexPatterns.FindMatches(text, RegexPatterns.IPv6Pattern);
-                foreach (Match match in ipv6Matches)
+                // Синтаксический анализ с новым SQL парсером
+                SqlParser sqlParser = new SqlParser(sqlTokens);
+                bool parseSuccess = sqlParser.Parse();
+                List<string> parseSteps = sqlParser.GetParseSteps();
+                List<SqlParseError> parseErrors = sqlParser.GetErrors();
+
+                // Выводим шаги разбора
+                outputGrid.Rows.Add("Информация", "---", "---", "Шаги синтаксического разбора:");
+                foreach (var step in parseSteps)
                 {
-                    outputGrid.Rows.Add(
-                        "IPv6",
-                        match.Value,
-                        $"{match.Index}-{match.Index + match.Length}",
-                        "IPv6 адрес"
-                    );
-                    HighlightWord(editor, match.Value, Color.Purple);
+                    outputGrid.Rows.Add("Шаг", step, "-", "-");
                 }
 
-                if (outputGrid.Rows.Count == 0)
+                // Выводим синтаксические ошибки, если есть
+                if (parseErrors.Any())
+                {
+                    outputGrid.Rows.Add("Информация", "---", "---", "Синтаксические ошибки:");
+                    foreach (var error in parseErrors)
+                    {
+                         // Для ошибок выводим позицию токена, вызвавшего ошибку
+                        outputGrid.Rows.Add(
+                            "Синт. Ошибка",
+                            error.Token.Value,
+                            error.Token.Position,
+                            error.Message
+                        );
+                         // Можно добавить подсветку ошибок
+                        // HighlightError(editor, error.Token.StartPosition, error.Token.EndPosition);
+                    }
+                }
+                 else if (parseSuccess) // Если нет ошибок и парсинг успешен
+                {
+                    outputGrid.Rows.Add("Информация", "---", "---", "Синтаксический анализ успешно завершен!");
+                }
+                 else // Если парсинг неуспешен, но нет ошибок (маловероятно с текущей реализацией) - или были ошибки, которые уже выведены
+                {
+                     // Дополнительное сообщение об ошибке, если нужно, но обычно ошибки уже выведены выше
+                 }
+
+                // --- Конец SQL Парсера --- //
+
+                // Удаляем или комментируем старый код лексического/синтаксического анализа, если он больше не нужен для button9
+                /*
+                // Лексический анализ (старый)
+                Lexer lexer = new Lexer(editor.Text);
+                List<Token> tokens = lexer.Tokenize();
+                List<ParseError> errors = lexer.GetErrors();
+
+                // Если есть лексические ошибки — выводим только ошибки
+                if (errors.Count > 0)
+                {
+                    foreach (var error in errors)
+                    {
+                        outputGrid.Rows.Add(
+                            "Ошибка",
+                            error.Token.Value,
+                            $"{error.Token.StartPosition}-{error.Token.EndPosition}",
+                            error.Message
+                        );
+                        HighlightError(editor, error.Token.StartPosition, error.Token.EndPosition);
+                    }
+                    return;
+                }
+
+                // Синтаксический анализ (старый)
+                RecursiveDescentParser parser = new RecursiveDescentParser(tokens);
+                if (!parser.Parse())
+                {
+                    foreach (var error in parser.GetErrors())
+                    {
+                        outputGrid.Rows.Add(
+                            "Ошибка",
+                            error.Token.Value,
+                            $"{error.Token.StartPosition}-{error.Token.EndPosition}",
+                            error.Message
+                        );
+                        HighlightError(editor, error.Token.StartPosition, error.Token.EndPosition);
+                    }
+                    return;
+                }
+
+                // Если ошибок нет — выводим токены и ПОЛИЗ (старый)
+                foreach (var token in tokens)
                 {
                     outputGrid.Rows.Add(
-                        "Информация",
-                        "-",
-                        "-",
-                        "Совпадений не найдено"
+                        token.Type,
+                        token.Value,
+                        $"{token.StartPosition}-{token.EndPosition}",
+                        token.Description
                     );
                 }
+                PolishNotation polish = new PolishNotation();
+                List<string> polishNotation = polish.ConvertToPolishNotation(tokens);
+                outputGrid.Rows.Add(-2, "---", "---", "Польская инверсная запись (ПОЛИЗ)");
+                string polizString = string.Join(" ", polishNotation);
+                outputGrid.Rows.Add(-2, polizString, "---", "Результат преобразования");
+                try
+                {
+                    double result = polish.EvaluatePolishNotation(polishNotation);
+                    outputGrid.Rows.Add(-2, result.ToString(), "---", "Результат вычисления");
+                    // Визуализация шагов
+                    var steps = polish.EvaluatePolishNotationWithSteps(polishNotation);
+                    var stepsForm = new FormPolishSteps(steps);
+                    stepsForm.Show();
+                }
+                catch (Exception ex)
+                {
+                    outputGrid.Rows.Add("Ошибка", "-", "-", $"Ошибка вычисления: {ex.Message}");
+                }
+                */
             }
         }
         private void ЗакрытьВкладку(TabPage tab)

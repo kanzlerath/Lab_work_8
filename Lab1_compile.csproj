@@ -76,6 +76,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>StringsEN.resx</DependentUpon>
     </Compile>
+    <Compile Include="SqlLexer.cs" />
+    <Compile Include="SqlParseError.cs" />
+    <Compile Include="SqlParser.cs" />
     <Compile Include="StatusBarManager.cs" />
     <Compile Include="Stroke.cs" />
     <Compile Include="EditorTab.cs">
